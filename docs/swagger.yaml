@@ -1,0 +1,478 @@
+basePath: /
+definitions:
+  dtos.CreateCompaniaEmpleadoRequest:
+    properties:
+      apellido:
+        type: string
+      cargo:
+        type: string
+      correo:
+        type: string
+      nombre:
+        type: string
+      salario:
+        type: number
+    required:
+    - apellido
+    - cargo
+    - correo
+    - nombre
+    - salario
+    type: object
+  dtos.CreateCompaniaRequest:
+    properties:
+      direccion:
+        type: string
+      nombre:
+        type: string
+      telefono:
+        type: string
+    required:
+    - direccion
+    - nombre
+    - telefono
+    type: object
+  dtos.CreateCompaniaWithEmpleadosRequest:
+    properties:
+      direccion:
+        type: string
+      empleados:
+        items:
+          $ref: '#/definitions/dtos.CreateCompaniaEmpleadoRequest'
+        type: array
+      nombre:
+        type: string
+      telefono:
+        type: string
+    required:
+    - direccion
+    - empleados
+    - nombre
+    - telefono
+    type: object
+  dtos.CreateEmpleadoRequest:
+    properties:
+      apellido:
+        type: string
+      cargo:
+        type: string
+      compania_id:
+        type: integer
+      correo:
+        type: string
+      nombre:
+        type: string
+      salario:
+        type: number
+    required:
+    - apellido
+    - cargo
+    - compania_id
+    - correo
+    - nombre
+    - salario
+    type: object
+  dtos.UpdateCompaniaRequest:
+    properties:
+      direccion:
+        type: string
+      nombre:
+        type: string
+      telefono:
+        type: string
+    required:
+    - direccion
+    - nombre
+    - telefono
+    type: object
+  dtos.UpdateEmpleadoRequest:
+    properties:
+      apellido:
+        type: string
+      cargo:
+        type: string
+      correo:
+        type: string
+      nombre:
+        type: string
+      salario:
+        type: number
+    required:
+    - apellido
+    - cargo
+    - correo
+    - nombre
+    - salario
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: API de gestión de compañías y empleados
+  title: Compania API
+  version: "1.0"
+paths:
+  /api/companias:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtener todas las compañías
+      tags:
+      - compañías
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Datos de la compañía
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateCompaniaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Crear una compañía
+      tags:
+      - compañías
+  /api/companias/{id}:
+    delete:
+      parameters:
+      - description: ID de la compañía
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Eliminar una compañía
+      tags:
+      - compañías
+    get:
+      parameters:
+      - description: ID de la compañía
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtener una compañía por ID
+      tags:
+      - compañías
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID de la compañía
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos de la compañía
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateCompaniaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Actualizar una compañía
+      tags:
+      - compañías
+  /api/companias/{id}/empleados:
+    get:
+      parameters:
+      - description: ID de la compañía
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtener empleados de una compañía
+      tags:
+      - compañías
+  /api/companias/con-empleados:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Compañía con empleados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateCompaniaWithEmpleadosRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Crear compañía con empleados
+      tags:
+      - compañías
+  /api/empleados:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtener todos los empleados
+      tags:
+      - empleados
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Datos del empleado
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateEmpleadoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Crear un empleado
+      tags:
+      - empleados
+  /api/empleados/{id}:
+    delete:
+      parameters:
+      - description: ID del empleado
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Eliminar un empleado
+      tags:
+      - empleados
+    get:
+      parameters:
+      - description: ID del empleado
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtener un empleado por ID
+      tags:
+      - empleados
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID del empleado
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos del empleado
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateEmpleadoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Actualizar un empleado
+      tags:
+      - empleados
+swagger: "2.0"

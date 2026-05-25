@@ -1,10 +1,11 @@
 package services
 
 import (
-	"errors"
 	"compania-api/application/dtos"
 	"compania-api/domain/entities"
 	"compania-api/domain/interfaces"
+	"errors"
+
 	"go.uber.org/zap"
 )
 

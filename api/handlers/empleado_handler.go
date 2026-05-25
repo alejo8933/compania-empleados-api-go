@@ -6,6 +6,7 @@ import (
 
 	"compania-api/application/dtos"
 	"compania-api/application/services"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +18,14 @@ func NewEmpleadoHandler(service *services.EmpleadoService) *EmpleadoHandler {
 	return &EmpleadoHandler{service: service}
 }
 
+// GetAll godoc
+//
+//	@Summary	Obtener todos los empleados
+//	@Tags		empleados
+//	@Produce	json
+//	@Success	200	{object}	map[string]interface{}
+//	@Failure	500	{object}	map[string]interface{}
+//	@Router		/api/empleados [get]
 func (h *EmpleadoHandler) GetAll(c *gin.Context) {
 	empleados, err := h.service.GetAll()
 	if err != nil {
@@ -35,6 +44,17 @@ func (h *EmpleadoHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetById godoc
+//
+//	@Summary	Obtener un empleado por ID
+//	@Tags		empleados
+//	@Produce	json
+//	@Param		id	path		int	true	"ID del empleado"
+//	@Success	200	{object}	map[string]interface{}
+//	@Failure	400	{object}	map[string]interface{}
+//	@Failure	404	{object}	map[string]interface{}
+//	@Failure	500	{object}	map[string]interface{}
+//	@Router		/api/empleados/{id} [get]
 func (h *EmpleadoHandler) GetById(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -71,6 +91,16 @@ func (h *EmpleadoHandler) GetById(c *gin.Context) {
 	})
 }
 
+// Create godoc
+//
+//	@Summary	Crear un empleado
+//	@Tags		empleados
+//	@Accept		json
+//	@Produce	json
+//	@Param		request	body		dtos.CreateEmpleadoRequest	true	"Datos del empleado"
+//	@Success	201		{object}	map[string]interface{}
+//	@Failure	400		{object}	map[string]interface{}
+//	@Router		/api/empleados [post]
 func (h *EmpleadoHandler) Create(c *gin.Context) {
 	var req dtos.CreateEmpleadoRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -106,6 +136,19 @@ func (h *EmpleadoHandler) Create(c *gin.Context) {
 	})
 }
 
+// Update godoc
+//
+//	@Summary	Actualizar un empleado
+//	@Tags		empleados
+//	@Accept		json
+//	@Produce	json
+//	@Param		id		path		int							true	"ID del empleado"
+//	@Param		request	body		dtos.UpdateEmpleadoRequest	true	"Datos del empleado"
+//	@Success	200		{object}	map[string]interface{}
+//	@Failure	400		{object}	map[string]interface{}
+//	@Failure	404		{object}	map[string]interface{}
+//	@Failure	500		{object}	map[string]interface{}
+//	@Router		/api/empleados/{id} [put]
 func (h *EmpleadoHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -152,6 +195,17 @@ func (h *EmpleadoHandler) Update(c *gin.Context) {
 	})
 }
 
+// Delete godoc
+//
+//	@Summary	Eliminar un empleado
+//	@Tags		empleados
+//	@Produce	json
+//	@Param		id	path	int	true	"ID del empleado"
+//	@Success	204
+//	@Failure	400	{object}	map[string]interface{}
+//	@Failure	404	{object}	map[string]interface{}
+//	@Failure	500	{object}	map[string]interface{}
+//	@Router		/api/empleados/{id} [delete]
 func (h *EmpleadoHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)

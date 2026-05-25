@@ -2,6 +2,7 @@ package routes
 
 import (
 	"compania-api/api/handlers"
+
 	"github.com/gin-gonic/gin"
 )
 

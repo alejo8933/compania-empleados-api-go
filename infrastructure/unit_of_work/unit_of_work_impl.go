@@ -1,9 +1,10 @@
 package unit_of_work
 
 import (
-	"errors"
 	"compania-api/domain/interfaces"
 	"compania-api/infrastructure/repositories"
+	"errors"
+
 	"gorm.io/gorm"
 )
 

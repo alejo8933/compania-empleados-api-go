@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"compania-api/domain/entities"
+
 	"gorm.io/gorm"
 )
 

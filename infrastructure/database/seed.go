@@ -2,6 +2,7 @@ package database
 
 import (
 	"compania-api/domain/entities"
+
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

@@ -1,9 +1,15 @@
+// @title			Compania API
+// @version		1.0
+// @description	API de gestión de compañías y empleados
+// @host			localhost:8081
+// @BasePath		/
 package main
 
 import (
 	"log"
 
 	"compania-api/api"
+
 	"go.uber.org/zap"
 )
 

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"compania-api/domain/entities"
+
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"

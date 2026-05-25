@@ -15,7 +15,12 @@ import (
 	"compania-api/application/services"
 	"compania-api/infrastructure/database"
 	"compania-api/infrastructure/unit_of_work"
+
+	_ "compania-api/docs"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 )
 
@@ -52,6 +57,8 @@ func (s *Server) Start() {
 
 	r.Use(middlewares.Logger(s.logger))
 	r.Use(middlewares.ErrorHandler(s.logger))
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	routes.SetupRoutes(r, compHandler, empHandler)
 
