@@ -1,11 +1,12 @@
 package services
 
 import (
+	"context"
 	"compania-api/application/dtos"
 	"compania-api/domain/entities"
 	"compania-api/domain/interfaces"
 	"errors"
-
+	
 	"go.uber.org/zap"
 )
 
@@ -156,4 +157,33 @@ func (s *EmpleadoService) Delete(id uint) error {
 
 	s.logger.Info("Empleado eliminado", zap.Uint("id", id))
 	return nil
+}
+// RegisterEmpleadoBatch orquesta la inserción masiva de empleados llamando al repositorio limpio
+func (s *EmpleadoService) RegisterEmpleadoBatch(ctx context.Context, dtos []dtos.EmpleadoBulkInputDTO) error {
+	var entidades []*entities.Empleado
+
+	// Mapear cada DTO a la entidad usando los campos exactos revelados por el JSON
+		for _, dto := range dtos {
+			empleado := &entities.Empleado{
+				Nombre:     dto.Nombre,
+				Apellido:   dto.Apellido,
+				Correo:     dto.Correo,
+				Cargo:      dto.Cargo,
+				Salario:    dto.Salario,
+				CompaniaID: dto.CompaniaID,
+			}
+			entidades = append(entidades, empleado)
+		}
+
+	// 2. Guardar el lote completo usando el método aprobado por el compilador
+	if err := s.uow.Empleados().CreateRange(ctx, entidades); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetEmpleadoPaged orquesta la consulta avanzada con filtros y paginación
+func (s *EmpleadoService) GetEmpleadoPaged(ctx context.Context, page, size int, orderBy, direction, search string) ([]entities.Empleado, int64, error) {
+	return s.uow.Empleados().GetPaged(ctx, page, size, orderBy, direction, search)
 }

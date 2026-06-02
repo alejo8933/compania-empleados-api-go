@@ -237,3 +237,47 @@ func (h *EmpleadoHandler) Delete(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+// RegisterBatchHandler procesa la inserción masiva aplicando validaciones (POST /api/empleados/lote)
+func (h *EmpleadoHandler) RegisterBatchHandler(c *gin.Context) {
+	var inputDTOs []dtos.EmpleadoBulkInputDTO
+
+	// 1. Decodificar el JSON usando la herramienta nativa de Gin
+	if err := c.ShouldBindJSON(&inputDTOs); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido: " + err.Error()})
+		return
+	}
+
+	// 2. VALIDACIÓN: Enviar a validar si tus DTOs lo requieren, o procesar directo
+	// Llamamos al servicio de aplicación que ya dejamos listo y aprobado
+	err := h.service.RegisterEmpleadoBatch(c.Request.Context(), inputDTOs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al procesar el lote: " + err.Error()})
+		return
+	}
+
+	// 3. Responder con estatus 201 Created según exige la guía
+	c.JSON(http.StatusCreated, gin.H{"message": "Lote de empleados registrado exitosamente"})
+}
+
+// GetPagedHandler procesa el listado avanzado con filtros (GET /api/empleados/paginado)
+func (h *EmpleadoHandler) GetPagedHandler(c *gin.Context) {
+	// Capturar parámetros de la URL usando los métodos de Gin
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
+	orderBy := c.Query("orderBy")
+	direction := c.Query("direction")
+	search := c.Query("search")
+
+	empleados, total, err := h.service.GetEmpleadoPaged(c.Request.Context(), page, size, orderBy, direction, search)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al obtener empleados: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":          empleados,
+		"total_records": total,
+		"page":          page,
+		"size":          size,
+	})
+}

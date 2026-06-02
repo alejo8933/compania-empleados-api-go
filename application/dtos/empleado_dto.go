@@ -26,3 +26,12 @@ type EmpleadoResponse struct {
 	Salario    float64 `json:"salario"`
 	CompaniaID uint    `json:"compania_id"`
 }
+// EmpleadoBulkInputDTO define la estructura y reglas del Módulo 3 para la inserción masiva
+type EmpleadoBulkInputDTO struct {
+	Nombre     string `json:"nombre" validate:"required,min=2,max=50"`
+	Apellido   string `json:"apellido" validate:"required,min=2,max=50"`
+	Correo     string `json:"correo" validate:"required,email"`
+	Cargo      string `json:"cargo"`
+	Salario    float64 `json:"salario"`
+	CompaniaID uint   `json:"compania_id" validate:"required"`
+}

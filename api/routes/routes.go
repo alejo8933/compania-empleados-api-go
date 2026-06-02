@@ -22,11 +22,14 @@ func SetupRoutes(r *gin.Engine, compHandler *handlers.CompaniaHandler, empHandle
 
 		empleados := api.Group("/empleados")
 		{
+			empleados.POST("/lote", empHandler.RegisterBatchHandler)
+			empleados.GET("/paginado", empHandler.GetPagedHandler)
 			empleados.GET("", empHandler.GetAll)
 			empleados.GET("/:id", empHandler.GetById)
 			empleados.POST("", empHandler.Create)
 			empleados.PUT("/:id", empHandler.Update)
 			empleados.DELETE("/:id", empHandler.Delete)
+			
 		}
 	}
 }
