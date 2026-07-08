@@ -158,31 +158,50 @@ func (s *EmpleadoService) Delete(id uint) error {
 	s.logger.Info("Empleado eliminado", zap.Uint("id", id))
 	return nil
 }
-// RegisterEmpleadoBatch orquesta la inserción masiva de empleados llamando al repositorio limpio
+// RegisterEmpleadoBatch orquesta la inserción masiva de empleados usando transaccionalidad atómica del UoW
 func (s *EmpleadoService) RegisterEmpleadoBatch(ctx context.Context, dtos []dtos.EmpleadoBulkInputDTO) error {
-	var entidades []*entities.Empleado
-
-	// Mapear cada DTO a la entidad usando los campos exactos revelados por el JSON
-		for _, dto := range dtos {
-			empleado := &entities.Empleado{
-				Nombre:     dto.Nombre,
-				Apellido:   dto.Apellido,
-				Correo:     dto.Correo,
-				Cargo:      dto.Cargo,
-				Salario:    dto.Salario,
-				CompaniaID: dto.CompaniaID,
-			}
-			entidades = append(entidades, empleado)
-		}
-
-	// 2. Guardar el lote completo usando el método aprobado por el compilador
-	if err := s.uow.Empleados().CreateRange(ctx, entidades); err != nil {
+	// 1. Iniciar la transacción formal desde el Unit of Work
+	tx, err := s.uow.BeginTx(ctx)
+	if err != nil {
+		s.logger.Error("No se pudo iniciar la transacción del lote", zap.Error(err))
 		return err
 	}
 
+	// Asegurar el Rollback automático en caso de un pánico imprevisto en el hilo de ejecución
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	var entidades []*entities.Empleado
+	for _, dto := range dtos {
+		empleado := &entities.Empleado{
+			Nombre:     dto.Nombre,
+			Apellido:   dto.Apellido,
+			Correo:     dto.Correo,
+			Cargo:      dto.Cargo,
+			Salario:    dto.Salario,
+			CompaniaID: dto.CompaniaID,
+		}
+		entidades = append(entidades, empleado)
+	}
+
+	// 2. Guardar el lote completo. Si falla un solo registro, se ejecuta Rollback
+	if err := s.uow.Empleados().CreateRange(ctx, entidades); err != nil {
+		s.logger.Warn("Error detectado en el lote de empleados. Ejecutando Rollback transaccional...", zap.Error(err))
+		tx.Rollback() 
+		return err
+	}
+
+	// 3. Si todos los registros son válidos, se consolidan permanentemente los cambios en PostgreSQL
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	s.logger.Info("Lote de empleados insertado con éxito de forma atómica")
 	return nil
 }
-
 // GetEmpleadoPaged orquesta la consulta avanzada con filtros y paginación
 func (s *EmpleadoService) GetEmpleadoPaged(ctx context.Context, page, size int, orderBy, direction, search string) ([]entities.Empleado, int64, error) {
 	return s.uow.Empleados().GetPaged(ctx, page, size, orderBy, direction, search)
